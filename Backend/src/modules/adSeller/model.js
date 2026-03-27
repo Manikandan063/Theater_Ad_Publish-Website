@@ -1,0 +1,29 @@
+import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
+
+const adSellerSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    agencyName: { type: String, required: true },
+    contactPerson: { type: String, required: true },
+    contactNumber: { type: String, required: true },
+    address: { type: String, required: true },
+    role: { type: String, default: 'adSeller' },
+    createdAt: { type: Date, default: Date.now },
+});
+
+// Hash password before saving
+adSellerSchema.pre('save', async function (next) {
+    if (!this.isModified('password')) return next();
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+});
+
+// Compare password
+adSellerSchema.methods.matchPassword = async function (enteredPassword) {
+    return await bcrypt.compare(enteredPassword, this.password);
+};
+
+const AdSeller = mongoose.model('AdSeller', adSellerSchema);
+export default AdSeller;
