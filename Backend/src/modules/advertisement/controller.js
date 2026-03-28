@@ -8,8 +8,16 @@ class AdvertisementController {
                 return res.status(403).json({ success: false, message: 'Only Ad Sellers can create ads' });
             }
 
+            const adData = { ...req.body };
+            
+            // Handle file upload
+            if (req.file) {
+                // If the app is running locally, use relative path or full URL. Usually better to use relative and handle full URL on frontend or via config
+                adData.mediaUrl = `/uploads/${req.file.filename}`;
+            }
+
             const ad = await AdvertisementService.create({
-                ...req.body,
+                ...adData,
                 adSellerId: req.user.id,
             });
 
@@ -40,7 +48,14 @@ class AdvertisementController {
 
     static async update(req, res) {
         try {
-            const ad = await AdvertisementService.update(req.params.id, req.body);
+            const updateData = { ...req.body };
+            
+            // Handle file upload
+            if (req.file) {
+                updateData.mediaUrl = `/uploads/${req.file.filename}`;
+            }
+
+            const ad = await AdvertisementService.update(req.params.id, updateData);
             if (!ad) return res.status(404).json({ success: false, message: 'Ad not found' });
             res.status(200).json({ success: true, data: ad });
         } catch (error) {

@@ -4,7 +4,13 @@ import cors from 'cors';
 import connectDB from './src/config/database.js';
 import allRoutes from './src/routes/index.js';
 
+import path from 'path';
+import { fileURLToPath } from 'url';
+
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
@@ -14,6 +20,9 @@ connectDB();
 // Middleware
 app.use(express.json());
 app.use(cors());
+
+// Static folder for file uploads
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
 app.use('/api', allRoutes);

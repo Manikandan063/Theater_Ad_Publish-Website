@@ -9,10 +9,21 @@ const TheaterOwnerDashboard = () => {
     const [loading, setLoading] = useState(true);
 
     const getYouTubeId = (url) => {
-        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-        const match = url?.match(regExp);
+        if (!url) return null;
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\/shorts\/)([^#\&\?]*).*/;
+        const match = url.match(regExp);
         return (match && match[2].length === 11) ? match[2] : null;
     };
+
+    const getMediaUrl = (url) => {
+        if (!url) return '';
+        if (url.startsWith('http')) return url;
+        // Ensure we don't end up with double slashes or missing slashes
+        const base = (axios.defaults.baseURL || 'http://localhost:5000').replace(/\/+$/, '');
+        const path = url.replace(/^\/+/, '');
+        return `${base}/${path}`;
+    };
+
     const [selectedQuote, setSelectedQuote] = useState(null);
     const [selectedPayment, setSelectedPayment] = useState(null);
     const [showPublishModal, setShowPublishModal] = useState(false);
@@ -261,10 +272,12 @@ const TheaterOwnerDashboard = () => {
                         {/* Media Preview Section */}
                         <div style={{ marginBottom: '1.5rem', borderRadius: '8px', overflow: 'hidden', background: '#000', border: '1px solid var(--border)', minHeight: '200px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             {(() => {
-                                const url = selectedQuote.advertisementId?.mediaUrl;
-                                if (!url) return <span style={{ color: 'var(--text-muted)' }}>No Media Preview Available</span>;
+                                const ad = selectedQuote.advertisementId;
+                                const rawUrl = ad?.mediaUrl;
+                                if (!rawUrl) return <span style={{ color: 'var(--text-muted)' }}>No Media Preview Available</span>;
 
-                                const ytId = getYouTubeId(url);
+                                // Handle YouTube/Vimeo/Embeddable links
+                                const ytId = getYouTubeId(rawUrl);
                                 if (ytId) {
                                     return (
                                         <iframe 
@@ -279,27 +292,46 @@ const TheaterOwnerDashboard = () => {
                                     );
                                 }
 
-                                if (url.match(/\.(mp4|webm|ogg)$/i)) {
+                                const finalUrl = getMediaUrl(rawUrl);
+                                const isVideo = ad.adType === 'video' || rawUrl.match(/\.(mp4|webm|ogg|mov|m4v|avi|mkv|3gp|wmv)$/i);
+
+                                if (isVideo) {
                                     return (
                                         <video 
-                                            src={url} 
+                                            src={finalUrl} 
                                             controls 
                                             controlsList="nodownload" 
                                             onContextMenu={(e) => e.preventDefault()}
                                             style={{ width: '100%', maxHeight: '300px' }} 
+                                            onError={(e) => {
+                                                e.target.style.display = 'none';
+                                                const fallbackDiv = e.target.parentElement;
+                                                fallbackDiv.innerHTML = `
+                                                    <div style="text-align: center; padding: 1rem; color: var(--text-muted)">
+                                                        <p>Video format not supported by browser.</p>
+                                                        <a href="${finalUrl}" target="_blank" style="color: var(--primary); font-size: 0.8rem">Open in New Tab</a>
+                                                    </div>
+                                                `;
+                                            }}
                                         />
                                     );
                                 }
 
                                 return (
                                     <img 
-                                        src={url} 
+                                        src={finalUrl} 
                                         onContextMenu={(e) => e.preventDefault()}
                                         alt="Ad Content" 
                                         style={{ width: '100%', maxHeight: '300px', objectFit: 'contain' }} 
                                         onError={(e) => {
                                             e.target.style.display = 'none';
-                                            e.target.parentElement.innerHTML = '<span style="color: var(--text-muted)">Preview not supported for this format</span>';
+                                            const fallbackDiv = e.target.parentElement;
+                                            fallbackDiv.innerHTML = `
+                                                <div style="text-align: center; padding: 1rem; color: var(--text-muted)">
+                                                    <p>Image preview failed.</p>
+                                                    <a href="${finalUrl}" target="_blank" style="color: var(--primary); font-size: 0.8rem">Open Image</a>
+                                                </div>
+                                            `;
                                         }}
                                     />
                                 );
@@ -348,7 +380,7 @@ const TheaterOwnerDashboard = () => {
                                     }
                                     return (
                                         <a 
-                                            href={selectedQuote.advertisementId.mediaUrl} 
+                                            href={getMediaUrl(selectedQuote.advertisementId.mediaUrl)} 
                                             download 
                                             className="btn btn-success" 
                                             style={{ padding: '0.6rem 1.5rem', textDecoration: 'none', color: 'white', fontWeight: 600 }}

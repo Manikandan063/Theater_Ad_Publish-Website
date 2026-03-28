@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import axios from 'axios';
+import Home from './pages/Home';
 import Login from './pages/Login';
 import AdSellerDashboard from './pages/adSeller/Dashboard';
 import TheaterOwnerDashboard from './pages/theaterOwner/Dashboard';
@@ -19,6 +21,7 @@ function App() {
           <Navbar />
           <main className="main-content">
             <Routes>
+              <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               

@@ -122,6 +122,16 @@ class QuotationController {
             res.status(500).json({ success: false, message: error.message });
         }
     }
+
+    static async update(req, res) {
+        try {
+            const quotation = await QuotationService.update(req.params.id, req.body);
+            if (!quotation) return res.status(404).json({ success: false, message: 'Quotation not found' });
+            res.status(200).json({ success: true, data: quotation });
+        } catch (error) {
+            res.status(500).json({ success: false, message: error.message });
+        }
+    }
 }
 
 export default QuotationController;

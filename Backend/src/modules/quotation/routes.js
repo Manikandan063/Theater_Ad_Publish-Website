@@ -16,6 +16,7 @@ router.get('/my/third-party-quotes', protect(['thirdParty', 'admin']), Quotation
 
 // Update status (Respond to quote) -> Done by Theater Owner
 router.patch('/:id/status', protect(['theaterOwner', 'admin', 'adSeller', 'thirdParty']), QuotationController.updateStatus);
+router.put('/:id', protect(['adSeller', 'admin', 'thirdParty']), QuotationController.update);
 router.delete('/:id', protect(['adSeller', 'admin']), QuotationController.delete);
 router.get('/:id', protect(['admin', 'theaterOwner', 'adSeller', 'thirdParty']), QuotationController.getById);
 
