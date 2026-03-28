@@ -8,9 +8,9 @@
  * Superadmin acts as the Developer/Platform Owner.
  */
 const SPLITS = {
-    THEATER_OWNER: 0.80,
+    THEATER_OWNER: 1.00,
     AD_SELLER: 0.00,
-    THIRD_PARTY: 0.20,
+    THIRD_PARTY: 0.00,
 };
 
 /**

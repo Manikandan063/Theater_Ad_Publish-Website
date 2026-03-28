@@ -12,13 +12,30 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         if (token) {
-            // In a real app, verify the token with the backend
-            // Here we just decode basic info or use what we saved
             const savedUser = JSON.parse(localStorage.getItem('user'));
             if (savedUser) setUser(savedUser);
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            
+            // Auto-logout on 401 Unauthorized (e.g., deleted users/re-seeded DB)
+            const interceptor = axios.interceptors.response.use(
+                (response) => response,
+                (error) => {
+                    if (error.response?.status === 401) {
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('user');
+                        window.location.href = '/login';
+                    }
+                    return Promise.reject(error);
+                }
+            );
+
+            setLoading(false);
+            return () => {
+                axios.interceptors.response.eject(interceptor);
+            };
+        } else {
+            setLoading(false);
         }
-        setLoading(false);
     }, [token]);
 
     const getEndpointPath = (role) => {
@@ -31,7 +48,7 @@ export const AuthProvider = ({ children }) => {
     const login = async (email, password, role) => {
         try {
             // Determine the endpoint based on role selected in form
-            const endpoint = `http://localhost:5000/api/${getEndpointPath(role)}/login`;
+            const endpoint = `/api/${getEndpointPath(role)}/login`;
             const response = await axios.post(endpoint, { email, password });
             
             const { token: newToken, data } = response.data;
@@ -50,7 +67,7 @@ export const AuthProvider = ({ children }) => {
 
     const register = async (userData, role) => {
         try {
-            const endpoint = `http://localhost:5000/api/${getEndpointPath(role)}/register`;
+            const endpoint = `/api/${getEndpointPath(role)}/register`;
             const response = await axios.post(endpoint, userData);
             
             const { token: newToken, data } = response.data;

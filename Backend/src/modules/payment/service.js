@@ -7,29 +7,35 @@ class PaymentService {
 
     static async findAll() {
         return await Payment.find()
-            .populate('advertisementId', 'title')
+            .populate('advertisementId', 'title duration')
             .populate('theaterOwnerId', 'name theaterName')
             .populate('adSellerId', 'name agencyName');
     }
 
     static async findById(id) {
         return await Payment.findById(id)
-            .populate('advertisementId', 'title')
+            .populate('advertisementId', 'title duration')
             .populate('theaterOwnerId', 'name theaterName')
             .populate('adSellerId', 'name agencyName');
     }
 
     static async findByTheaterOwner(id) {
-        return await Payment.find({ theaterOwnerId: id });
+        return await Payment.find({ theaterOwnerId: id })
+            .populate('advertisementId', 'title duration')
+            .populate('adSellerId', 'name agencyName');
     }
 
     static async findByAdSeller(id) {
-        return await Payment.find({ adSellerId: id });
+        return await Payment.find({ adSellerId: id })
+            .populate('advertisementId', 'title duration')
+            .populate('theaterOwnerId', 'name theaterName');
     }
 
-    static async findByThirdParty() {
-        // System wide (Third party can see all usually if they are the platform)
-        return await Payment.find();
+    static async findByThirdParty(id) {
+        return await Payment.find({ thirdPartyId: id })
+            .populate('advertisementId', 'title duration')
+            .populate('theaterOwnerId', 'name theaterName')
+            .populate('adSellerId', 'name agencyName');
     }
 
     static async update(id, data) {

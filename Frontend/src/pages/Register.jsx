@@ -6,9 +6,9 @@ const Register = () => {
     const [role, setRole] = useState('adSeller');
     const [formData, setFormData] = useState({
         name: '', email: '', password: '', 
-        theaterName: '', location: '', contactNumber: '', // For TheaterOwner
-        agencyName: '', contactPerson: '', address: '',   // For AdSeller
-        companyName: '', website: ''                      // For ThirdParty
+        theaterName: '', location: '', contactNumber: '',
+        agencyName: '', contactPerson: '', address: '',
+        companyName: '', website: ''
     });
     const [error, setError] = useState('');
     const { register } = useAuth();
@@ -45,78 +45,86 @@ const Register = () => {
 
     return (
         <div className="register-container">
-            <div className="register-box">
-                <h2>Join the Portal 🎭</h2>
+            <div className="register-box glass-card slide-in">
+                <h2>Join X-TOWN</h2>
+                <p className="auth-subtitle">Initialize your business partnership today.</p>
+                
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
-                        <label>Register As</label>
-                        <select value={role} onChange={(e) => setRole(e.target.value)}>
-                            <option value="adSeller">Ad Seller</option>
-                            <option value="theaterOwner">Theater Owner</option>
-                            <option value="thirdParty">Third Party Partner</option>
+                        <label>Business Partnership Type</label>
+                        <select 
+                            value={role} 
+                            onChange={(e) => setRole(e.target.value)}
+                            style={{ background: 'var(--bg-elevated)', cursor: 'pointer' }}
+                        >
+                            <option value="adSeller">Ad Publisher (Brand)</option>
+                            <option value="theaterOwner">Theater Owner (Screen)</option>
+                            <option value="thirdParty">Third Party Partner (Agent)</option>
                         </select>
                     </div>
 
                     <div className="form-grid">
                         <div className="form-group">
-                            <label>Full Name</label>
-                            <input name="name" type="text" onChange={handleChange} required />
+                            <label>Primary Representative Name</label>
+                            <input name="name" type="text" placeholder="John Doe" onChange={handleChange} required />
                         </div>
                         <div className="form-group">
-                            <label>Email Address</label>
-                            <input name="email" type="email" onChange={handleChange} required />
+                            <label>Business Email</label>
+                            <input name="email" type="email" placeholder="john@company.com" onChange={handleChange} required />
                         </div>
                         <div className="form-group">
-                            <label>Password</label>
-                            <input name="password" type="password" onChange={handleChange} required />
+                            <label>Security Password</label>
+                            <input name="password" type="password" placeholder="••••••••" onChange={handleChange} required />
                         </div>
                         <div className="form-group">
-                            <label>Contact Number</label>
-                            <input name="contactNumber" type="text" onChange={handleChange} required />
+                            <label>Primary Contact Number</label>
+                            <input name="contactNumber" type="text" placeholder="+91 98XXX XXXXX" onChange={handleChange} required />
                         </div>
 
                         {/* Conditional Fields */}
                         {role === 'theaterOwner' && <>
                             <div className="form-group">
                                 <label>Theater Name</label>
-                                <input name="theaterName" type="text" onChange={handleChange} required />
+                                <input name="theaterName" type="text" placeholder="PVR Cinemas" onChange={handleChange} required />
                             </div>
                             <div className="form-group">
-                                <label>Location</label>
-                                <input name="location" type="text" onChange={handleChange} required />
+                                <label>Location / City</label>
+                                <input name="location" type="text" placeholder="Mumbai, MH" onChange={handleChange} required />
                             </div>
                         </>}
 
                         {role === 'adSeller' && <>
                             <div className="form-group">
-                                <label>Agency Name</label>
-                                <input name="agencyName" type="text" onChange={handleChange} required />
+                                <label>Agency / Brand Name</label>
+                                <input name="agencyName" type="text" placeholder="Ogilvy & Mather" onChange={handleChange} required />
                             </div>
                             <div className="form-group">
-                                <label>Contact Person</label>
-                                <input name="contactPerson" type="text" onChange={handleChange} required />
-                            </div>
-                            <div className="form-group">
-                                <label>Address</label>
-                                <input name="address" type="text" onChange={handleChange} required />
+                                <label>Registered Address</label>
+                                <input name="address" type="text" placeholder="Business Park, Bangalore" onChange={handleChange} required />
                             </div>
                         </>}
 
                         {role === 'thirdParty' && <>
                             <div className="form-group">
-                                <label>Company Name</label>
-                                <input name="companyName" type="text" onChange={handleChange} required />
+                                <label>Consultancy Name</label>
+                                <input name="companyName" type="text" placeholder="AdStream Global" onChange={handleChange} required />
                             </div>
                             <div className="form-group">
-                                <label>Website</label>
-                                <input name="website" type="text" onChange={handleChange} />
+                                <label>Official Website</label>
+                                <input name="website" type="text" placeholder="https://adstream.com" onChange={handleChange} />
                             </div>
                         </>}
                     </div>
 
-                    {error && <p className="error-message">{error}</p>}
-                    <button type="submit" className="register-btn">Register</button>
-                    <p className="login-link">Already have an account? <Link to="/login">Login here</Link></p>
+                    {error && <div className="error-message">{error}</div>}
+
+                    <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '2rem', fontSize: '1rem' }}>
+                        Initialize Partnership
+                    </button>
+
+                    <div style={{ marginTop: '2rem', textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+                        Already a partner? <Link to="/login" style={{ color: 'var(--brand-primary)', fontWeight: 600, textDecoration: 'none' }}>Sign In</Link>
+                    </div>
                 </form>
             </div>
         </div>

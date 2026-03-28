@@ -31,6 +31,8 @@ class TheaterOwnerController {
                     id: owner._id,
                     name: owner.name,
                     email: owner.email,
+                    theaterName: owner.theaterName,
+                    location: owner.location,
                 },
             });
         } catch (error) {
@@ -51,6 +53,8 @@ class TheaterOwnerController {
                         id: owner._id,
                         name: owner.name,
                         email: owner.email,
+                        theaterName: owner.theaterName,
+                        location: owner.location,
                     },
                 });
             } else {

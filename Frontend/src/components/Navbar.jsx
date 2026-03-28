@@ -1,10 +1,11 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const Navbar = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const handleLogout = () => {
         logout();
@@ -13,20 +14,62 @@ const Navbar = () => {
 
     if (!user) return null;
 
+    const isActive = (path) => location.pathname.startsWith(path);
+
     return (
-        <nav className="navbar">
+        <nav className="navbar glass-card" style={{ 
+            margin: '1rem', 
+            borderRadius: 'var(--radius-xl)', 
+            padding: '0.75rem 2rem',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            position: 'sticky',
+            top: '1rem',
+            zIndex: 1000,
+            background: 'rgba(30, 41, 59, 0.8)',
+            border: '1px solid rgba(255, 255, 255, 0.05)'
+        }}>
             <div className="navbar-brand">
-                <Link to="/">🎬 Theatre Ads</Link>
+                <Link to="/" style={{ textDecoration: 'none' }}>
+                    <span>X-TOWN</span>
+                </Link>
             </div>
-            <div className="navbar-links">
-                {user.role === 'admin' && <Link to="/admin">Admin Hub</Link>}
-                {user.role === 'theaterOwner' && <Link to="/theater-owner">Owner Dash</Link>}
-                {user.role === 'adSeller' && <Link to="/ad-seller">Seller Dash</Link>}
-                {user.role === 'thirdParty' && <Link to="/third-party">Partner Dash</Link>}
+            
+            <div className="navbar-links" style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+                <Link to="/profile" className={`nav-link ${isActive('/profile') ? 'active' : ''}`}>Profile</Link>
                 
-                <Link to="/profile" style={{ marginRight: '15px' }}>My Profile</Link>
-                <span className="user-info">Welcome, {user.name}</span>
-                <button onClick={handleLogout} className="logout-btn">Logout</button>
+                {user.role === 'admin' && (
+                    <Link to="/admin" className={`nav-link ${isActive('/admin') ? 'active' : ''}`}>Admin</Link>
+                )}
+                {user.role === 'theaterOwner' && (
+                    <Link to="/theater-owner" className={`nav-link ${isActive('/theater-owner') ? 'active' : ''}`}>Theater</Link>
+                )}
+                {user.role === 'adSeller' && (
+                    <>
+                        <Link to="/ad-seller" className={`nav-link ${isActive('/ad-seller') ? 'active' : ''}`}>Ads</Link>
+                        <Link to="/third-party" className={`nav-link ${isActive('/third-party') ? 'active' : ''}`}>Partners</Link>
+                    </>
+                )}
+                {user.role === 'thirdParty' && (
+                    <Link to="/third-party" className={`nav-link ${isActive('/third-party') ? 'active' : ''}`}>Broker</Link>
+                )}
+                
+                <div style={{ width: '1px', height: '24px', background: 'var(--glass-border)' }}></div>
+                
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <Link to="/profile" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                            <span style={{ color: 'var(--brand-primary)', fontWeight: 600 }}>{user.name}</span>
+                        </span>
+                        <div style={{ padding: '0.2rem', background: 'rgba(255,255,255,0.05)', borderRadius: '50%' }}>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        </div>
+                    </Link>
+                    <button onClick={handleLogout} className="btn btn-secondary" style={{ padding: '0.4rem 1rem', fontSize: '0.8rem' }}>
+                        Logout
+                    </button>
+                </div>
             </div>
         </nav>
     );

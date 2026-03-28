@@ -125,7 +125,7 @@ const seedDatabase = async () => {
 
         console.log('💬 Quotations & Negotiations Seeded...');
 
-        // 7. Seed Payments & Custom Commissions (80 / 0 / 20 logic visualised)
+        // 7. Seed Payments & Custom Commissions (100 / 0 / 0 logic visualised)
         const amount = 10000;
         await Payment.create({
             advertisementId: ad1._id,
@@ -134,13 +134,13 @@ const seedDatabase = async () => {
             thirdPartyId: thirdParty1._id,
             amount: amount,
             numberOfScreens: 4,
-            theaterOwnerShare: amount * 0.80,
+            theaterOwnerShare: amount * 1.0,
             adSellerShare: 0,
-            thirdPartyShare: amount * 0.20,
+            thirdPartyShare: 0,
             paymentType: "weekly",
             transactionId: `TXN-${Date.now()}-A92B`,
             status: "paid",
-            remarks: "Standard 4 Screen weekly interval payment"
+            remarks: "Standard 4 Screen weekly interval direct payment (100% to owner)"
         });
 
         console.log('💳 Payments & Auto-Commissions Seeded...');

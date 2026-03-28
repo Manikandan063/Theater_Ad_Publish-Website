@@ -17,15 +17,15 @@ const SuperAdminDashboard = () => {
     const fetchInitialData = async () => {
         try {
             const [ownersRes, sellersRes, partiesRes, paymentsRes] = await Promise.all([
-                axios.get('http://localhost:5000/api/theater-owners'),
-                axios.get('http://localhost:5000/api/ad-sellers'),
-                axios.get('http://localhost:5000/api/third-parties'),
-                axios.get('http://localhost:5000/api/payments')
+                axios.get('/api/theater-owners'),
+                axios.get('/api/ad-sellers'),
+                axios.get('/api/third-parties'),
+                axios.get('/api/payments')
             ]);
-            setOwners(ownersRes.data.data);
-            setSellers(sellersRes.data.data);
-            setParties(partiesRes.data.data);
-            setPayments(paymentsRes.data.data);
+            setOwners(ownersRes.data.data || []);
+            setSellers(sellersRes.data.data || []);
+            setParties(partiesRes.data.data || []);
+            setPayments(paymentsRes.data.data || []);
             setLoading(false);
         } catch (err) {
             console.error(err);
@@ -33,81 +33,121 @@ const SuperAdminDashboard = () => {
         }
     };
 
-    if (loading) return <p>Loading Admin Portal...</p>;
+    if (loading) return <div className="main-content"><p>Loading Admin Command Center...</p></div>;
+
+    const totalRevenue = payments.reduce((acc, p) => acc + (p.amount || 0), 0);
+    const totalUsers = owners.length + sellers.length + parties.length;
 
     return (
-        <div className="dashboard-container admin-dashboard">
+        <div className="main-content">
             <header className="dash-header">
-                <h1>Super Admin Control Center</h1>
-                <div className="summary-stats">
-                    <p>Total Revenue Flow: 💎 <strong>₹{payments.reduce((acc, p) => acc + p.amount, 0).toFixed(2)}</strong></p>
-                    <p>Total Users: 👤 <strong>{owners.length + sellers.length + parties.length}</strong></p>
+                <div>
+                    <h1>Platform Control Center</h1>
+                    <p style={{ color: 'var(--text-secondary)' }}>Global system overview and financial auditing.</p>
+                </div>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                    <div className="badge badge-success" style={{ padding: '0.5rem 1rem' }}>System Operational</div>
                 </div>
             </header>
 
-            <div className="dash-grid">
-                <section className="list-section">
-                    <h3>🎬 Managed Theaters</h3>
-                    <div className="scroll-list">
+            <div className="stats-grid">
+                <div className="stat-card">
+                    <div className="stat-label">Total GTV (Gross Transaction Value)</div>
+                    <div className="stat-value">₹{totalRevenue.toFixed(2)}</div>
+                </div>
+                <div className="stat-card">
+                    <div className="stat-label">Platform Participants</div>
+                    <div className="stat-value">{totalUsers}</div>
+                </div>
+                <div className="stat-card">
+                    <div className="stat-label">Active Theaters</div>
+                    <div className="stat-value">{owners.length}</div>
+                </div>
+                <div className="stat-card">
+                    <div className="stat-label">System Commission</div>
+                    <div className="stat-value">0%</div>
+                </div>
+            </div>
+
+            <div className="dash-grid" style={{ marginTop: '2.5rem' }}>
+                <div style={{ gridColumn: 'span 12' }}>
+                    <div className="glass-card">
+                        <h3 style={{ marginBottom: '1.5rem' }}>Global Transaction Ledger</h3>
+                        <div className="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Campaign</th>
+                                        <th>Theater</th>
+                                        <th>Publisher</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>Timestamp</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {payments.length > 0 ? payments.map(p => (
+                                        <tr key={p._id}>
+                                            <td style={{ fontWeight: 600 }}>{p.advertisementId?.title}</td>
+                                            <td style={{ color: 'var(--text-secondary)' }}>{p.theaterOwnerId?.theaterName}</td>
+                                            <td style={{ color: 'var(--text-secondary)' }}>{p.adSellerId?.agencyName || p.adSellerId?.name}</td>
+                                            <td className="price-tag">₹{p.amount}</td>
+                                            <td>
+                                                <span className={`badge badge-${p.status === 'paid' ? 'success' : 'pending'}`}>
+                                                    {p.status}
+                                                </span>
+                                            </td>
+                                            <td>{new Date(p.paymentDate).toLocaleDateString()}</td>
+                                        </tr>
+                                    )) : (
+                                        <tr>
+                                            <td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>No system transactions.</td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div style={{ gridColumn: 'span 4', marginTop: '1.5rem' }} className="glass-card">
+                    <h4>🎬 Screens ({owners.length})</h4>
+                    <div style={{ marginTop: '1rem', maxHeight: '300px', overflowY: 'auto' }}>
                         {owners.map(o => (
-                            <div key={o._id} className="user-card">
-                                <strong>{o.theaterName}</strong>
-                                <p>Owner: {o.name}</p>
-                                <span className="location-text">📍 {o.location}</span>
+                            <div key={o._id} style={{ padding: '0.75rem', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <div>
+                                    <div style={{ fontSize: '0.9rem', fontWeight: 600 }}>{o.theaterName}</div>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{o.location}</div>
+                                </div>
+                                <div className="badge badge-success" style={{ fontSize: '0.6rem' }}>Online</div>
                             </div>
                         ))}
                     </div>
-                </section>
+                </div>
 
-                <section className="list-section">
-                    <h3>💰 Registered Ad Sellers</h3>
-                    <div className="scroll-list">
+                <div style={{ gridColumn: 'span 4', marginTop: '1.5rem' }} className="glass-card">
+                    <h4>💰 Publishers ({sellers.length})</h4>
+                    <div style={{ marginTop: '1rem', maxHeight: '300px', overflowY: 'auto' }}>
                         {sellers.map(s => (
-                            <div key={s._id} className="user-card">
-                                <strong>{s.agencyName}</strong>
-                                <p>Email: {s.email}</p>
+                            <div key={s._id} style={{ padding: '0.75rem', borderBottom: '1px solid var(--glass-border)' }}>
+                                <div style={{ fontSize: '0.9rem', fontWeight: 600 }}>{s.agencyName}</div>
+                                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{s.email}</div>
                             </div>
                         ))}
                     </div>
-                </section>
+                </div>
 
-                <section className="list-section">
-                    <h3>🤝 Third Party Partners</h3>
-                    <div className="scroll-list">
+                <div style={{ gridColumn: 'span 4', marginTop: '1.5rem' }} className="glass-card">
+                    <h4>🤝 Brokers ({parties.length})</h4>
+                    <div style={{ marginTop: '1rem', maxHeight: '300px', overflowY: 'auto' }}>
                         {parties.map(p => (
-                            <div key={p._id} className="user-card">
-                                <strong>{p.companyName}</strong>
-                                <p>Contact: {p.email}</p>
+                            <div key={p._id} style={{ padding: '0.75rem', borderBottom: '1px solid var(--glass-border)' }}>
+                                <div style={{ fontSize: '0.9rem', fontWeight: 600 }}>{p.companyName}</div>
+                                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{p.email}</div>
                             </div>
                         ))}
                     </div>
-                </section>
-
-                <section className="list-section full-width">
-                    <h3>🏦 System-Wide Financial Audit 📜</h3>
-                    <table className="data-table">
-                        <thead>
-                            <tr>
-                                <th>Ad</th>
-                                <th>Theater</th>
-                                <th>Amount</th>
-                                <th>Status</th>
-                                <th>Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {payments.map(p => (
-                                <tr key={p._id}>
-                                    <td>{p.advertisementId?.title}</td>
-                                    <td>{p.theaterOwnerId?.theaterName}</td>
-                                    <td>₹{p.amount}</td>
-                                    <td><span className={`status-badge ${p.status}`}>{p.status}</span></td>
-                                    <td>{new Date(p.paymentDate).toLocaleDateString()}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </section>
+                </div>
             </div>
         </div>
     );

@@ -32,6 +32,7 @@ class AdSellerController {
                     id: seller._id,
                     name: seller.name,
                     email: seller.email,
+                    agencyName: seller.agencyName,
                 },
             });
         } catch (error) {
@@ -52,6 +53,7 @@ class AdSellerController {
                         id: seller._id,
                         name: seller.name,
                         email: seller.email,
+                        agencyName: seller.agencyName,
                     },
                 });
             } else {

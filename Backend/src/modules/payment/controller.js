@@ -4,23 +4,26 @@ import { calculateCommission, summarizePayments } from '../../utils/payment.js';
 class PaymentController {
     static async processPayment(req, res) {
         try {
-            const { advertisementId, theaterOwnerId, adSellerId, amount, paymentType, numberOfScreens, remarks } = req.body;
+            const { advertisementId, theaterOwnerId, adSellerId, thirdPartyId, amount, paymentType, numberOfScreens, remarks } = req.body;
             
-            if (!advertisementId || !theaterOwnerId || !adSellerId || !amount || !paymentType) {
+            if (!advertisementId || (!theaterOwnerId && !thirdPartyId) || !adSellerId || !amount || !paymentType) {
                 return res.status(400).json({ success: false, message: 'Missing required fields' });
             }
 
-            const { theaterOwnerShare, adSellerShare, thirdPartyShare } = calculateCommission(amount);
+            const shares = req.body.theaterOwnerShare !== undefined ? {
+                theaterOwnerShare: req.body.theaterOwnerShare,
+                adSellerShare: req.body.adSellerShare,
+                thirdPartyShare: req.body.thirdPartyShare
+            } : calculateCommission(amount);
 
             const payment = await PaymentService.create({
                 advertisementId,
-                theaterOwnerId,
+                theaterOwnerId: theaterOwnerId || null,
+                thirdPartyId: thirdPartyId || null,
                 adSellerId,
                 amount,
                 numberOfScreens: numberOfScreens || 1,
-                theaterOwnerShare,
-                adSellerShare,
-                thirdPartyShare,
+                ...shares,
                 paymentType,
                 transactionId: `TXN-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
                 status: 'paid',

@@ -12,7 +12,7 @@ router.get('/:id', protect(['admin']), PaymentController.getById);
 router.post('/process', protect(['theaterOwner', 'adSeller', 'admin']), PaymentController.processPayment);
 
 // My payments and summary reports (Based on role: owner, seller, admin)
-router.get('/my/history', protect(['theaterOwner', 'adSeller', 'admin']), PaymentController.getMyPayments);
+router.get('/my/history', protect(['theaterOwner', 'adSeller', 'admin', 'thirdParty']), PaymentController.getMyPayments);
 
 // Update/Delete (Admin only)
 router.put('/:id', protect(['admin']), PaymentController.update);

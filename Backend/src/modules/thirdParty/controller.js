@@ -31,6 +31,8 @@ class ThirdPartyController {
                     id: party._id,
                     name: party.name,
                     email: party.email,
+                    companyName: party.companyName,
+                    website: party.website,
                 },
             });
         } catch (error) {
@@ -51,6 +53,8 @@ class ThirdPartyController {
                         id: party._id,
                         name: party.name,
                         email: party.email,
+                        companyName: party.companyName,
+                        website: party.website,
                     },
                 });
             } else {

@@ -7,16 +7,18 @@ class QuotationService {
 
     static async findAll() {
         return await Quotation.find()
-            .populate('advertisementId', 'title description')
+            .populate('advertisementId', 'title description mediaUrl adType')
             .populate('theaterOwnerId', 'name theaterName')
-            .populate('adSellerId', 'name agencyName');
+            .populate('adSellerId', 'name agencyName')
+            .populate('thirdPartyId', 'name companyName');
     }
 
     static async findById(id) {
         return await Quotation.findById(id)
-            .populate('advertisementId', 'title description')
+            .populate('advertisementId', 'title description mediaUrl adType')
             .populate('theaterOwnerId', 'name theaterName')
-            .populate('adSellerId', 'name agencyName');
+            .populate('adSellerId', 'name agencyName')
+            .populate('thirdPartyId', 'name companyName');
     }
 
     static async update(id, data) {
@@ -28,15 +30,30 @@ class QuotationService {
     }
 
     static async findByAdId(adId) {
-        return await Quotation.find({ advertisementId: adId });
+        return await Quotation.find({ advertisementId: adId })
+            .populate('theaterOwnerId', 'name theaterName')
+            .populate('adSellerId', 'name agencyName');
     }
 
     static async findByTheaterOwnerId(ownerId) {
-        return await Quotation.find({ theaterOwnerId: ownerId });
+        return await Quotation.find({ theaterOwnerId: ownerId })
+            .populate('advertisementId', 'title description duration mediaUrl adType')
+            .populate('adSellerId', 'name agencyName')
+            .populate('thirdPartyId', 'name companyName');
+    }
+
+    static async findByThirdPartyId(brokerId) {
+        return await Quotation.find({ thirdPartyId: brokerId })
+            .populate('advertisementId', 'title description duration mediaUrl adType')
+            .populate('adSellerId', 'name agencyName')
+            .populate('theaterOwnerId', 'name theaterName');
     }
 
     static async findByAdSellerId(sellerId) {
-        return await Quotation.find({ adSellerId: sellerId });
+        return await Quotation.find({ adSellerId: sellerId })
+            .populate('advertisementId', 'title description mediaUrl adType')
+            .populate('theaterOwnerId', 'name theaterName')
+            .populate('thirdPartyId', 'name companyName');
     }
 }
 
